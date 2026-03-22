@@ -18,16 +18,27 @@
       padding: 20px;
     }
     .container { width: 100%; max-width: 700px; }
-    h1 { font-size: 2rem; color: #38bdf8; margin-bottom: 8px; text-align: center; }
-    .subtitle { text-align: center; color: #94a3b8; margin-bottom: 32px; font-size: 1rem; }
+    .header { text-align: center; margin-bottom: 24px; }
+    h1 { font-size: 2rem; color: #38bdf8; margin-bottom: 6px; }
+    .subtitle { color: #94a3b8; font-size: 0.95rem; }
+    .badge {
+      display: inline-block;
+      background: #0f3a4a;
+      color: #38bdf8;
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid #0284c7;
+      margin-bottom: 10px;
+    }
     .chat-box {
       background: #1e293b;
       border-radius: 16px;
       padding: 24px;
-      min-height: 300px;
-      max-height: 500px;
+      min-height: 350px;
+      max-height: 480px;
       overflow-y: auto;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       border: 1px solid #334155;
     }
     .msg-user { margin-bottom: 16px; text-align: right; }
@@ -39,8 +50,15 @@
       display: inline-block;
       max-width: 80%;
       line-height: 1.5;
+      font-size: 0.95rem;
     }
     .msg-bot { margin-bottom: 16px; text-align: left; }
+    .msg-bot .nombre {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
     .msg-bot span {
       background: #334155;
       color: #e2e8f0;
@@ -48,10 +66,31 @@
       border-radius: 16px 16px 16px 4px;
       display: inline-block;
       max-width: 80%;
-      line-height: 1.5;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
     }
-    .msg-bot .nombre { font-size: 0.75rem; color: #38bdf8; margin-bottom: 4px; font-weight: bold; }
-    .placeholder { color: #475569; text-align: center; margin-top: 100px; font-size: 0.9rem; }
+    .sugerencias {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      background: #0f3a4a;
+    }
     .input-area { display: flex; gap: 10px; }
     input[type="text"] {
       flex: 1;
@@ -78,33 +117,51 @@
     button:hover { background: #7dd3fc; }
     button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
     .typing { color: #38bdf8; font-size: 0.85rem; margin-bottom: 8px; display: none; }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #475569;
+      font-size: 0.78rem;
+    }
+    .footer span { color: #38bdf8; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🧭 PathMentor</h1>
-    <p class="subtitle">Tu mentor de carrera en tech para latinoamericanos</p>
 
-    <div class="chat-box" id="chat">
-      <p class="placeholder" id="placeholder">
-        Haz tu primera pregunta sobre carreras en tech 👇
-      </p>
+    <div class="header">
+      <div class="badge">✨ IA para LATAM</div>
+      <h1>🧭 PathMentor</h1>
+      <p class="subtitle">Tu mentor de carrera en tech para latinoamericanos</p>
     </div>
+
+    <div class="chat-box" id="chat"></div>
 
     <p class="typing" id="typing">🧭 PathMentor está escribiendo...</p>
 
+    <div class="sugerencias" id="sugerencias">
+      <span class="chip" onclick="preguntar(this)">¿Por dónde empiezo en tech?</span>
+      <span class="chip" onclick="preguntar(this)">¿Cuánto gana un dev en LATAM?</span>
+      <span class="chip" onclick="preguntar(this)">¿SQL o Python primero?</span>
+      <span class="chip" onclick="preguntar(this)">¿Cómo consigo trabajo remoto desde Perú?</span>
+    </div>
+
     <div class="input-area">
       <input type="text" id="userInput"
-        placeholder="Ej: ¿Cómo entro a tech desde cero en LATAM?" />
+        placeholder="Escribe tu pregunta sobre carreras en tech..." />
       <button id="btnEnviar" onclick="sendMessage()">Enviar</button>
     </div>
+
+    <div class="footer">
+      Hecho con ❤️ para LATAM · <span>PathMentor</span> · CubePath Hackathon 2026
+    </div>
+
   </div>
 
   <script>
-    // 🔑 PEGA TU KEY DE OPENROUTER AQUÍ (empieza con sk-or-...)
-    const API_KEY = "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";
+    // 🔑 TU API KEY DE OPENROUTER
+    const API_KEY = "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";
 
-    // 🧠 Personalidad del mentor
     const SYSTEM_PROMPT = `Eres PathMentor, un mentor de carrera en tecnología 
 especializado en ayudar a jóvenes latinoamericanos a entrar al mundo tech. 
 Tu tono es motivador, cercano y directo. Siempre das consejos concretos y 
@@ -114,17 +171,37 @@ Respondes en español. Tus respuestas son claras y no muy largas (máximo 4 pár
 Si alguien pregunta algo que no es sobre carreras tech, redirígelo amablemente 
 hacia ese tema.`;
 
+    // Mensaje de bienvenida automático
+    function mostrarBienvenida() {
+      const chat = document.getElementById('chat');
+      chat.innerHTML = `
+        <div class="msg-bot">
+          <div class="nombre">🧭 PathMentor</div>
+          <span>¡Hola! Soy PathMentor, tu mentor de carrera en tech para latinoamericanos. 👋
+
+Estoy aquí para ayudarte a entrar al mundo de la tecnología desde cero, sin importar dónde estés en LATAM.
+
+Puedes preguntarme sobre carreras, salarios, cómo conseguir trabajo remoto, qué aprender primero, y mucho más. ¿Por dónde empezamos?</span>
+        </div>`;
+    }
+
+    function preguntar(chip) {
+      document.getElementById('userInput').value = chip.textContent;
+      document.getElementById('sugerencias').style.display = 'none';
+      sendMessage();
+    }
+
     async function sendMessage() {
       const input = document.getElementById('userInput');
       const chat = document.getElementById('chat');
       const btn = document.getElementById('btnEnviar');
       const typing = document.getElementById('typing');
-      const placeholder = document.getElementById('placeholder');
+      const sugerencias = document.getElementById('sugerencias');
       const text = input.value.trim();
 
       if (!text) return;
 
-      if (placeholder) placeholder.remove();
+      sugerencias.style.display = 'none';
 
       chat.innerHTML += `
         <div class="msg-user">
@@ -170,8 +247,7 @@ hacia ese tema.`;
         chat.innerHTML += `
           <div class="msg-bot">
             <span style="color:#f87171">
-              ⚠️ Hubo un error al conectar con la IA. 
-              Verifica tu API key e intenta de nuevo.
+              ⚠️ Hubo un error. Verifica tu API key e intenta de nuevo.
             </span>
           </div>`;
       }
@@ -184,6 +260,9 @@ hacia ese tema.`;
     document.getElementById('userInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') sendMessage();
     });
+
+    // Iniciar con bienvenida
+    mostrarBienvenida();
   </script>
 </body>
 </html>
