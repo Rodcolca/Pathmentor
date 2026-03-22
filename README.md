@@ -44,6 +44,28 @@ El proyecto está desplegado en un servidor **gp.nano de CubePath** con:
 CubePath permitió levantar el servidor en minutos con los $15 de crédito gratuito,
 sin necesidad de tarjeta de crédito.
 
+## 🤖 Transparencia — Cómo construí esto
+
+Soy **Rodrigo**, tengo 19 años, soy de Lima, Perú, y esta es mi **primera hackatón**.
+
+Cuando empecé este proyecto no sabía nada de programación — nunca había escrito 
+una línea de código real, nunca había usado Git, nunca había desplegado nada en internet.
+
+Usé **Claude (IA de Anthropic)** como mentor técnico durante todo el proceso:
+me explicó cada concepto desde cero, me ayudó a depurar errores, y me guió 
+paso a paso como si fuera un videojuego con misiones.
+
+En 2 días aprendí a:
+- ✅ Instalar herramientas de desarrollo (VS Code, Node.js, Git)
+- ✅ Crear y gestionar repositorios en GitHub
+- ✅ Escribir HTML, CSS y JavaScript
+- ✅ Conectar una API de IA gratuita
+- ✅ Desplegar en un servidor VPS real con Nginx
+
+**PathMentor nació de mi propia necesidad** — soy exactamente el tipo de persona 
+que esta app quiere ayudar: un joven latinoamericano que quiere entrar a tech 
+desde cero, sin recursos, sin experiencia, pero con muchas ganas.
+
 ## 🚀 Cómo correrlo localmente
 
 1. Clona el repositorio:
@@ -55,11 +77,5 @@ sin necesidad de tarjeta de crédito.
 
 ## 👤 Autor
 
-Hecho con ❤️ por **Corasannn** para la CubePath Hackathon 2026
+Hecho con ❤️ por **Corasannn** · Lima, Perú · CubePath Hackathon 2026
 ```
-
-Guarda con **Ctrl + S** y súbelo a GitHub:
-```
-git add .
-git commit -m "Agregar README del proyecto"
-git push
