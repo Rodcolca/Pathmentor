@@ -13,6 +13,12 @@ else
   exit 1
 fi
 
+if [ ! -f "$REPO_DIR/.env.local" ]; then
+  echo "[post-deploy] Missing required env file: $REPO_DIR/.env.local" >&2
+  echo "[post-deploy] Create it on VPS before restarting systemd." >&2
+  exit 1
+fi
+
 if command -v systemctl >/dev/null 2>&1; then
   echo "[post-deploy] Ensuring systemd unit is installed..."
   sudo install -m 0644 ops/pathmentor.service /etc/systemd/system/pathmentor.service
