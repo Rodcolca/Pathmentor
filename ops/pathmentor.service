@@ -1,0 +1,16 @@
+[Unit]
+Description=PathMentor backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/pathmentor/server
+ExecStart=/usr/bin/node dist/server.js
+Restart=on-failure
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/pathmentor/.env.local
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,65 @@
+import { Readable } from 'node:stream';
+import { Router } from 'express';
+import type { AppConfig } from '../config/env';
+import { HttpError } from '../errors/httpError';
+import { chatRequestSchema } from '../schemas/chat';
+import { streamCompletion } from '../services/openrouterClient';
+
+export const createChatRouter = (config: AppConfig) => {
+  const router = Router();
+
+  router.post('/', async (req, res, next) => {
+    const parsed = chatRequestSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return next(new HttpError(400, 'Invalid request body', true));
+    }
+
+    const abortController = new AbortController();
+
+    req.on('close', () => {
+      abortController.abort();
+    });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    try {
+      const upstreamResponse = await streamCompletion(
+        parsed.data,
+        config.openRouter,
+        abortController.signal
+      );
+
+      if (!upstreamResponse.body) {
+        throw new HttpError(502, 'Upstream response missing body');
+      }
+
+      const stream = Readable.fromWeb(upstreamResponse.body);
+
+      for await (const chunk of stream) {
+        res.write(chunk);
+      }
+
+      res.end();
+    } catch (error) {
+      if (abortController.signal.aborted) {
+        return;
+      }
+
+      if (!res.headersSent) {
+        return next(error);
+      }
+
+      const message =
+        error instanceof Error ? error.message : 'Internal Server Error';
+
+      res.write(`event: error\ndata: ${JSON.stringify({ message })}\n\n`);
+      res.end();
+    }
+  });
+
+  return router;
+};

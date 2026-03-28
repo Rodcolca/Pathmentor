@@ -1,0 +1,12 @@
+## Phase 1 Apply Progress — secure-deploy-upgrade
+
+- Bootstrapped backend workspace under `server/` with TypeScript tooling, scripts, and npm lockfile.
+- Added shared utilities for env validation (Zod), logging (Pino), HTTP errors, request context, rate limiting, and error handling.
+- Composed Express app/server startup with CORS, JSON parsing, request tracing, health check, chat rate limiter placeholder (no chat route yet), and standardized error responses.
+- Documented required environment variables in root `.env.example`.
+
+## Phase 2 Apply Progress — secure-deploy-upgrade
+
+- Added Zod schema for chat requests with bounds and defaults.
+- Implemented OpenRouter streaming client with upstream status mapping and abort support.
+- Created `/api/chat` SSE proxy route, wired validation + streaming, and mounted into the app.
